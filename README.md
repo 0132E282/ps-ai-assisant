@@ -1,92 +1,239 @@
-# Voice-Controlled AI Robot & PC Assistant 🤖🎙️
+# 🤖 PS-AI Robot Assistant
 
-A multi-modal AI assistant system that integrates computer vision, speech recognition, and large language models (LLMs) to control physical robots and personal computers through natural language.
+Trợ lý AI thông minh hỗ trợ điều khiển robot và PC qua giọng nói, với khả năng chuyển đổi linh hoạt giữa các AI providers.
 
----
+## ✨ Tính năng
 
-## 🎯 Project Objectives
-
-Building an AI system capable of:
-- **Speech Interaction**: Recognizing voice commands in both Vietnamese and English.
-- **Intent Understanding**: Leveraging GPT-4o-mini to interpret complex user intentions.
-- **Physical Robotics**: Controlling robot movements (forward, backward, turn, stop) via Raspberry Pi.
-- **PC Automation**: Executing system commands (open apps, play music, volume control).
-- **Audio Feedback**: Responding to users via high-quality Text-to-Speech.
+- 🎯 **Trigger Keywords** - Kích hoạt behaviors bằng từ khóa
+- 🗣️ **Voice Control** - Điều khiển bằng giọng nói (tiếng Việt)
+- 🤖 **Multi-AI Support** - Gemini, ChatGPT, Claude, LLaMA
+- 💻 **Web Dashboard** - Giao diện quản lý hiện đại
+- 📊 **Dynamic Model Selection** - Chọn AI model theo thời gian thực
+- 🔊 **Enhanced TTS** - Giọng nói tự nhiên, rõ ràng
 
 ---
 
-## 🧠 System Architecture
+## 🚀 Quick Start
 
-The system follows a layered architecture combining **MVC (Model-View-Controller)** principles with the **MCP (Model Context Protocol)** for secure and scalable AI-to-Hardware communication.
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+cd ps-ai-robot-assistant
+```
 
-```mermaid
-graph TD
-    User((User)) -->|Voice| Micro[Microphone]
-    Micro --> STT[Whisper STT]
-    STT -->|Text| AI[AI Reasoning - GPT-4o-mini]
-    AI -->|Command JSON| Protocol[MCP Controller]
-    
-    subgraph Controller [Python Logic Center]
-        Protocol --> Parse{Command Parser}
-        Parse -->|Physical| Robot[Raspberry Pi / GPIO]
-        Parse -->|Virtual| PC[PC Subprocess / OS API]
-    end
-    
-    Robot --> Action1[Motor Movement]
-    PC --> Action2[App/Media Control]
-    
-    Parse -->|Response Text| TTS[gTTS / FPT AI]
-    TTS -->|Voice| Speaker[Speaker]
+### 2. Setup Backend (Python)
+```bash
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate   # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Setup environment variables
+cp .env.example .env
+# Edit .env with your API keys
+nano .env
+```
+
+### 3. Setup Frontend (React)
+```bash
+cd frontend
+pnpm install  # or npm install
+pnpm dev      # Start dev server
+```
+
+### 4. Run Application
+```bash
+# Terminal 1: Backend
+source venv/bin/activate
+python web_dashboard.py
+
+# Terminal 2: Frontend
+cd frontend
+pnpm dev
+
+# Terminal 3: Voice Interface (optional)
+source venv/bin/activate
+python main.py
 ```
 
 ---
 
-## 🧩 Technology Stack
+## 🔑 Environment Variables
 
-| Component | Technology |
-|---|---|
-| **Programming Language** | Python 3.x |
-| **Hardware** | Raspberry Pi 4/5 (Robot), Desktop/Laptop (Assistant) |
-| **Speech-to-Text (STT)** | OpenAI Whisper |
-| **AI Reasoning** | GPT-4o-mini |
-| **Text-to-Speech (TTS)** | gTTS / FPT AI |
-| **Hardware Interface** | RPi.GPIO (Motor Drivers) |
-| **PC Control** | `subprocess`, `pyautogui`, `os` |
-| **Communication** | MCP (Model Context Protocol) |
+Copy `.env.example` to `.env` and configure:
+
+```bash
+# Required: Choose AI provider
+AI_PROVIDER=gemini  # or openai, claude, llama
+
+# Google Gemini (Recommended for free tier)
+GEMINI_API_KEY=your_api_key_here
+
+# Optional: Other providers
+OPENAI_API_KEY=your_openai_key
+CLAUDE_API_KEY=your_claude_key
+GROQ_API_KEY=your_groq_key
+```
+
+### Get API Keys:
+- **Gemini**: https://ai.google.dev/
+- **OpenAI**: https://platform.openai.com/
+- **Claude**: https://console.anthropic.com/
+- **Groq (LLaMA)**: https://console.groq.com/
 
 ---
 
-## 📄 Command Schema (JSON)
+## 📖 Documentation
 
-The AI model remains "sandboxed" and only outputs structured JSON, which is then validated and executed by the Python Controller.
+- [📊 System Overview](docs/SYSTEM_OVERVIEW.md)
+- [🎯 Trigger Keywords Guide](docs/TRIGGER_KEYWORDS.md)
+- [🆕 Update Log](docs/UPDATE_LOG.md)
+- [🔧 API Endpoints](docs/API_MODELS_ENDPOINT.md)
+- [⚠️ Quota Troubleshooting](docs/QUOTA_TROUBLESHOOTING.md)
 
-```json
-{
-  "intent": "move_robot",
-  "action": "forward",
-  "duration": 2,
-  "app": null,
-  "song": null,
-  "speech": "I am moving forward for 2 seconds"
-}
+---
+
+## 🎯 Usage Examples
+
+### Voice Commands
+```
+"Mở Chrome"           → Opens Google Chrome
+"Giới thiệu"          → AI introduces itself
+"Phát nhạc"           → Plays music
+"Di chuyển về phía trước" → Robot moves forward
+```
+
+### Web Dashboard
+```
+http://localhost:5173  → Frontend
+http://localhost:8000  → Backend API
+```
+
+### Add Behavior with Trigger
+```bash
+curl -X POST http://localhost:8000/api/add-behavior \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Mở Chrome",
+    "trigger_keywords": "mở chrome, chrome đi",
+    "command_type": "open_app",
+    "params": {"app_name": "Google Chrome"}
+  }'
 ```
 
 ---
 
-## 🔐 Safety & Security
+## 🏗️ Project Structure
 
-- **Sandboxed Execution**: The AI does not have direct shell access.
-- **Whitelisting**: Only pre-approved applications can be opened on the PC.
-- **Hardware Safeguards**: Robot commands include mandatory duration/speed limits and "emergency stop" triggers.
-- **Validation**: All JSON commands are parsed and validated against strictly defined schemas.
+```
+ps-ai-robot-assistant/
+├── controllers/          # API endpoints
+│   ├── chat_controller.py
+│   ├── behavior_controller.py
+│   ├── settings_controller.py
+│   └── robot_controller.py
+├── services/            # Business logic
+│   ├── gemini_service.py
+│   ├── llama_service.py
+│   ├── tts_service.py
+│   └── trigger_detector.py
+├── frontend/            # React app
+│   └── src/
+│       └── pages/
+│           ├── Admin.jsx
+│           └── Settings.jsx
+├── docs/               # Documentation
+├── .env.example        # Environment template
+└── .gitignore         # Git ignore rules
+```
 
 ---
 
-## 🚀 Future Roadmap
+## 🛠️ Tech Stack
 
-- [ ] ROS2 Integration for advanced SLAM and Navigation.
-- [ ] Computer Vision (OpenCV) for face/object tracking.
-- [ ] Low-latency Edge TTS for faster response times.
-- [ ] Mobile App dashboard for remote monitoring.
-# ps-ai-assisant
-# ps-ai-assisant
+**Backend:**
+- Python 3.9+
+- FastAPI
+- SQLAlchemy
+- Google Gemini API
+
+**Frontend:**
+- React + Vite
+- TailwindCSS
+- Framer Motion
+
+**AI Providers:**
+- Google Gemini
+- OpenAI GPT
+- Anthropic Claude
+- LLaMA (Ollama/Groq)
+
+---
+
+## 🔒 Security
+
+⚠️ **IMPORTANT**: Never commit `.env` file to Git!
+
+- ✅ `.env` is in `.gitignore`
+- ✅ Use `.env.example` as template
+- ✅ Keep API keys secret
+- ✅ Rotate keys if exposed
+
+---
+
+## 🐛 Troubleshooting
+
+### Gemini Quota Exceeded
+```bash
+# Switch to LLaMA (local, no quota)
+AI_PROVIDER=llama
+LLAMA_PROVIDER=ollama
+
+# Or use different Gemini model
+GEMINI_MODEL=models/gemini-2.5-flash
+```
+
+### Frontend Not Loading
+```bash
+# Clear Vite cache
+rm -rf frontend/node_modules/.vite
+cd frontend && pnpm dev
+```
+
+### Voice Commands Not Working
+```bash
+# Check microphone permissions
+# Try manual input mode instead
+```
+
+---
+
+## 📝 License
+
+MIT License - See LICENSE file
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open Pull Request
+
+---
+
+## 📧 Support
+
+- Documentation: `docs/`
+- Issues: GitHub Issues
+- Email: support@example.com
+
+---
+
+**Made with ❤️ by PS-AI Team**  
+Version: 2.1.0 | Last Updated: 2026-01-02
