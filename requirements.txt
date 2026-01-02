@@ -1,0 +1,15 @@
+openai
+python-dotenv
+pygame
+gtts
+speechrecognition
+pyaudio
+sqlalchemy
+fastapi
+uvicorn
+jinja2
+python-multipart
+pymysql
+google-genai
+cryptography
+requests
